@@ -1,0 +1,32 @@
+{
+  "name": "method-override-examples",
+  "version": "1.0.0",
+  "description": "Examples of using ExpressJS's method-override middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/philipmat/method-override-examples.git"
+  },
+  "keywords": [
+    "express",
+    "method-override",
+    "http-verbs",
+    "PUT",
+    "DELETE",
+    "FORM"
+  ],
+  "author": "Philip Mateescu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/philipmat/method-override-examples/issues"
+  },
+  "homepage": "https://github.com/philipmat/method-override-examples#readme",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "express": "^4.14.1",
+    "method-override": "^2.3.7"
+  }
+}
