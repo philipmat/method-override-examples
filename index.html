@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>method-override examples</title>
+</head>
+<body>
+
+<h1>Using headers</h1>    
+Client code:
+<pre>
+var xhr = new XMLHttpRequest();
+xhr.open('POST', '/log', true); // needs to be POST
+xhr.setRequestHeader('X-HTTP-Method-Override', 'DELETE');
+xhr.send();
+</pre>
+Server code:
+<pre>
+app.use(methodOverride('X-HTTP-Method-Override'));
+</pre>
+
+Try it:
+<button id="header-put">PUT</button>
+<button id="header-delete">DELETE</button>
+
+<h1>Using FORM POST with Query String</h1>
+Client code:
+<pre>
+&lt;form method="POST" action="/log?_method=DELETE" enctype="application/x-www-form-urlencoded">
+  &lt;button type="submit">DELETE&lt;/button>
+&lt;/form>
+</pre>
+Server code:
+<pre>
+app.use(methodOverride('_method'));
+</pre>
+<form method="POST" action="/log?_method=PUT" enctype="application/x-www-form-urlencoded">
+  <button type="submit">PUT</button>
+</form>
+<form method="POST" action="/log?_method=DELETE" enctype="application/x-www-form-urlencoded">
+  <button type="submit">DELETE</button>
+</form>
+
+<h1>Using FORM POST with Hidden Field</h1>
+Client code:
+<pre>
+
+&lt;form method="POST" action="/log" enctype="application/x-www-form-urlencoded">
+  &lt;input type="hidden" name="_method" value="DELETE">
+  &lt;button type="submit">DELETE&lt;/button>
+&lt;/form>
+
+</pre>
+Server code:
+<pre>
+// need body-parser to be able to retrieve FORM POST data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(methodOverride(function (req, res) {
+  if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+    // look in urlencoded POST bodies and delete it
+    var method = req.body._method;
+    delete req.body._method;
+    return method;
+  }
+}));
+</pre>
+<form method="POST" action="/log" enctype="application/x-www-form-urlencoded">
+  <input type="hidden" name="_method" value="PUT">
+  <button type="submit">PUT</button>
+</form>
+<form method="POST" action="/log" enctype="application/x-www-form-urlencoded">
+  <input type="hidden" name="_method" value="DELETE">
+  <button type="submit">DELETE</button>
+</form>
+
+<h1>Using GET with Special Query String</h1>
+<h2>Don't. Just don't.</h2>
+<p>
+<strong>
+Don't take this approach because anything crawling
+or pre-fetching these URLs can delete records within
+your data store.
+</strong>
+</p>
+<p>Also PUTs with no payloads make no sense</p>
+
+Client code:
+<pre>
+&lt;a href="/log?_method=PUT">PUT&lt;/a>
+</pre>
+Server code:
+<pre>
+app.use(methodOverride('_method', { methods: ['GET', 'POST'] }));
+</pre>
+
+<a href="/log?_method=PUT">PUT</a>
+<a href="/log?_method=DELETE">DELETE</a>
+
+<script>
+function xhrSend(method) {
+    console.log(method + '-ing to /log');
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/log', true);
+    xhr.setRequestHeader('X-HTTP-Method-Override', method);
+    xhr.send();
+}
+document.getElementById('header-put')
+    .addEventListener('click', () => xhrSend('PUT'));
+document.getElementById('header-delete')
+    .addEventListener('click', () => xhrSend('DELETE'));
+</script>
+</body>
+</html>
